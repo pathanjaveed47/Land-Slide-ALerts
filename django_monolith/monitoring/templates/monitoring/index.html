@@ -1,0 +1,517 @@
+{% extends "monitoring/base.html" %}
+
+{% block content %}
+<div class="flex-1 flex flex-col md:flex-row h-full overflow-hidden">
+
+    <!-- LEFT SIDEBAR: Real-time Telemetry Metrics & Simulator -->
+    <section class="w-full md:w-96 bg-slate-900/90 border-r border-slate-800 flex flex-col shrink-0 overflow-y-auto p-4 space-y-4">
+        
+        <!-- Active Warning Banner (Hidden until Warning/Critical) -->
+        <div id="evacuation-banner" class="hidden p-4 rounded-xl bg-red-600/20 border-2 border-red-500/80 animate-pulse text-red-200">
+            <div class="flex items-center gap-2 font-black text-sm uppercase tracking-wider text-red-400">
+                <span class="text-xl">⚠️</span> MASS EVACUATION ALERT ACTIVE
+            </div>
+            <p id="evacuation-msg" class="text-xs mt-1 text-red-300">High pore pressure and shear displacement detected in mountain slope sector.</p>
+        </div>
+
+        <!-- Telemetry Key Metric Gauges -->
+        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 space-y-3">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Live In-Situ Telemetry</h2>
+                <span id="active-station-badge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700">CHAMOLI-01</span>
+            </div>
+
+            <!-- Metric 1: Cumulative Rainfall -->
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-slate-400">72h Cumulative Rain</span>
+                    <div class="text-lg font-bold font-mono text-white flex items-baseline gap-1">
+                        <span id="gauge-rainfall">22.4</span> <span class="text-xs text-slate-500 font-normal">mm</span>
+                    </div>
+                </div>
+                <div class="text-2xl">🌧️</div>
+            </div>
+
+            <!-- Metric 2: Soil Saturation -->
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-slate-400">Soil Moisture Content</span>
+                    <div class="text-lg font-bold font-mono text-white flex items-baseline gap-1">
+                        <span id="gauge-moisture">35.0</span> <span class="text-xs text-slate-500 font-normal">%</span>
+                    </div>
+                </div>
+                <div class="text-2xl">💧</div>
+            </div>
+
+            <!-- Metric 3: Inclinometer Acceleration -->
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-slate-400">Shear Strain Acceleration</span>
+                    <div class="text-lg font-bold font-mono text-white flex items-baseline gap-1">
+                        <span id="gauge-accel">0.32</span> <span class="text-xs text-slate-500 font-normal">mm/s²</span>
+                    </div>
+                </div>
+                <div class="text-2xl">📈</div>
+            </div>
+
+            <!-- Metric 4: AI Multi-Horizon Risk -->
+            <div class="p-3 rounded-lg bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-300">AI Risk Forecasting</span>
+                    <span id="badge-risk-level" class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">SAFE</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1 font-mono text-xs">
+                    <div class="p-1.5 rounded bg-slate-950/70 border border-slate-800/60">
+                        <span class="text-[10px] text-slate-400 block">T+1h Immediate</span>
+                        <span id="gauge-t1h" class="text-sm font-bold text-slate-200">4.2%</span>
+                    </div>
+                    <div class="p-1.5 rounded bg-slate-950/70 border border-slate-800/60">
+                        <span class="text-[10px] text-slate-400 block">T+6h Saturation</span>
+                        <span id="gauge-t6h" class="text-sm font-bold text-slate-200">8.1%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authority Action Controls (Evacuation Trigger) -->
+        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 space-y-3">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <span>🛡️</span> Civil Authority Emergency Actions
+            </h2>
+            {% if is_authority %}
+            <button onclick="triggerAuthorityEvacuation()" class="w-full py-2.5 px-3 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2">
+                <span>🚨</span> Trigger Mass Evacuation Alert
+            </button>
+            {% else %}
+            <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400">
+                <p>Authority controls locked. Toggle role to <strong class="text-slate-200">'Civil Authority'</strong> in top right to enable manual evacuation dispatch.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Interactive Telemetry & SOS Simulator for Demonstration -->
+        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 space-y-2.5">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Interactive Team Simulator</h2>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="simulateTelemetry(false)" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors">
+                    🌤️ Normal Weather
+                </button>
+                <button onclick="simulateTelemetry(true)" class="p-2 rounded-lg bg-amber-600/30 hover:bg-amber-600/40 text-amber-200 text-xs font-medium border border-amber-500/40 transition-colors">
+                    ⛈️ Cloudburst Surge
+                </button>
+            </div>
+            <button onclick="openSosModal()" class="w-full py-2 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-200 text-xs font-medium border border-blue-500/40 transition-colors flex items-center justify-center gap-1.5">
+                <span>📢</span> Submit Citizen SOS Report
+            </button>
+        </div>
+    </section>
+
+    <!-- CENTER & RIGHT: Map View & Live SOS Incidents Feed -->
+    <section class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- GIS Map Container -->
+        <div class="flex-1 relative w-full h-full min-h-[350px]">
+            <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
+
+            <!-- Map Overlay Legend -->
+            <div class="absolute bottom-5 left-5 z-[1000] bg-slate-900/90 backdrop-blur-md p-3 rounded-lg border border-slate-800 text-xs shadow-xl space-y-1.5 font-mono">
+                <div class="font-bold text-slate-300 mb-1">GIS Map Legend</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Sensor Station (Normal)</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span> Critical Failure Warning</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-600/40 border border-red-500"></span> Predicted Debris Danger Zone</div>
+            </div>
+        </div>
+
+        <!-- BOTTOM STRIP: Live Crowdsourced SOS Feed & Incident Verification -->
+        <div class="h-56 bg-slate-900/95 border-t border-slate-800 shrink-0 flex flex-col overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <span>📡</span> Live Crowdsourced SOS & Field Observations
+                </h3>
+                <span class="text-[11px] text-slate-500">Evaluated in real-time by Hugging Face Flan-T5</span>
+            </div>
+
+            <div id="sos-feed-container" class="flex-1 overflow-y-auto p-3 space-y-2 divide-y divide-slate-800/40">
+                {% if recent_sos_reports %}
+                    {% for r in recent_sos_reports %}
+                    <div class="pt-2 flex items-start justify-between gap-3 text-xs" id="sos-card-{{ r.id }}">
+                        <div class="space-y-1 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-slate-400 font-semibold">{{ r.user_id }}</span>
+                                {% if r.is_spam %}
+                                    <span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px]">Filtered: {{ r.detected_category }}</span>
+                                {% else %}
+                                    <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[10px]">{{ r.detected_category }}</span>
+                                {% endif %}
+                                <span class="px-1.5 py-0.5 rounded text-[10px] {% if r.verification_status == 'Verified' %}bg-emerald-500/20 text-emerald-400{% else %}bg-amber-500/20 text-amber-400{% endif %}">
+                                    {{ r.verification_status }}
+                                </span>
+                            </div>
+                            <p class="text-slate-300 font-sans leading-relaxed">"{{ r.text_description }}"</p>
+                        </div>
+                        {% if is_authority and r.verification_status == 'Pending' %}
+                        <div class="flex items-center gap-1 shrink-0 pt-1">
+                            <button onclick="verifySos('{{ r.id }}', 'Verified')" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-medium">Verify</button>
+                            <button onclick="verifySos('{{ r.id }}', 'Rejected')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 text-[11px]">Reject</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div id="no-sos-placeholder" class="text-center py-6 text-xs text-slate-500">
+                        No active SOS reports. Use the simulator panel on the left to submit a report.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </section>
+
+</div>
+
+<!-- Modal: Submit Citizen SOS Report -->
+<div id="sos-modal" class="hidden fixed inset-0 z-[2000] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>📢</span> Submit Citizen SOS Observation
+            </h3>
+            <button onclick="closeSosModal()" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <p class="text-xs text-slate-400">Reports are processed in real-time by Flan-T5 to classify authentic geotechnical precursors vs spam.</p>
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block text-slate-300 font-medium mb-1">Citizen / Reporter ID</label>
+                <input id="sos-reporter-id" type="text" value="RESIDENT-SLOPE-12" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-white font-mono">
+            </div>
+            <div>
+                <label class="block text-slate-300 font-medium mb-1">Visual Observation</label>
+                <textarea id="sos-text" rows="3" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500" placeholder="e.g., Muddy springs suddenly leaking near retaining wall, trees visibly tilting."></textarea>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" onclick="setSosExample(1)" class="px-2 py-1 rounded bg-slate-800 text-[10px] text-slate-300 hover:bg-slate-700">Muddy Spring</button>
+                <button type="button" onclick="setSosExample(2)" class="px-2 py-1 rounded bg-slate-800 text-[10px] text-slate-300 hover:bg-slate-700">Leaning Trees</button>
+                <button type="button" onclick="setSosExample(3)" class="px-2 py-1 rounded bg-slate-800 text-[10px] text-slate-300 hover:bg-slate-700">Spam Sample</button>
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+            <button onclick="closeSosModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs">Cancel</button>
+            <button onclick="submitCitizenSos()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs">Send SOS</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // --------------------------------------------------------------------------
+    // 1. LEAFLET.JS GIS MAP SETUP
+    // --------------------------------------------------------------------------
+    const initialStations = {{ initial_stations_json|safe }};
+    const defaultCoords = [30.155, 78.245]; // Centered on Chamoli Mountain Sector
+
+    // Initialize Map with OpenStreetMap Basemap
+    const map = L.map('map', {
+        center: defaultCoords,
+        zoom: 13,
+        zoomControl: true
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors | GeoSentinel LEWS'
+    }).addTo(map);
+
+    // Marker storage and active danger polygon reference
+    const stationMarkers = {};
+    let activeHazardPolygon = null;
+
+    // Plot initial monitoring stations on the map
+    initialStations.forEach(station => {
+        const marker = L.circleMarker([station.lat, station.lon], {
+            radius: 9,
+            fillColor: '#10b981',
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85
+        }).addTo(map);
+
+        marker.bindPopup(`
+            <div class="font-sans text-xs">
+                <strong>${station.name}</strong><br>
+                Station ID: <code class="bg-slate-100 p-0.5 rounded">${station.station_id}</code><br>
+                Status: <span class="text-emerald-600 font-bold">${station.status}</span>
+            </div>
+        `);
+        stationMarkers[station.station_id] = marker;
+    });
+
+    /**
+     * Dynamically renders or updates a color-coded polygon representing the danger zone.
+     * Triggered when a 'Critical Warning' or 'Evacuation Alert' payload is received over WebSocket.
+     */
+    function drawHazardPolygon(polygonPoints, riskLevel) {
+        if (!polygonPoints || polygonPoints.length === 0) return;
+
+        // Remove previous polygon if present
+        if (activeHazardPolygon) {
+            map.removeLayer(activeHazardPolygon);
+        }
+
+        const isCritical = riskLevel === 'Critical';
+        const polyColor = isCritical ? '#dc2626' : '#ea580c';
+
+        // Draw Leaflet polygon
+        activeHazardPolygon = L.polygon(polygonPoints, {
+            color: polyColor,
+            fillColor: polyColor,
+            fillOpacity: 0.55,
+            weight: 3,
+            className: isCritical ? 'hazard-polygon-critical' : ''
+        }).addTo(map);
+
+        activeHazardPolygon.bindPopup(`
+            <div class="font-sans text-xs">
+                <strong class="text-red-600 font-bold uppercase">⚠️ PREDICTED DEBRIS FLOW ZONE</strong><br>
+                Risk Status: <strong>${riskLevel}</strong><br>
+                <em>Immediate evacuation of downslope area required.</em>
+            </div>
+        `).openPopup();
+
+        // Pan and fit map viewport to hazard polygon
+        map.fitBounds(activeHazardPolygon.getBounds(), { padding: [40, 40], maxZoom: 15 });
+    }
+
+    // --------------------------------------------------------------------------
+    // 2. VANILLA JAVASCRIPT WEBSOCKET CLIENT (Django Channels)
+    // --------------------------------------------------------------------------
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/telemetry/`;
+    let socket = null;
+
+    function initWebSocket() {
+        socket = new WebSocket(wsUrl);
+
+        socket.onopen = function(e) {
+            console.log('[WebSocket] Connected to GeoSentinel real-time early warning stream.');
+            updateWsBadge(true, 'WS: Connected');
+
+            // Register client geolocation for localized Haversine geofencing
+            socket.send(JSON.stringify({
+                type: 'register_location',
+                latitude: defaultCoords[0],
+                longitude: defaultCoords[1],
+                radius_km: 25.0
+            }));
+        };
+
+        socket.onmessage = function(e) {
+            const payload = JSON.parse(e.data);
+            handleIncomingPayload(payload);
+        };
+
+        socket.onclose = function(e) {
+            console.warn('[WebSocket] Connection closed. Retrying in 3 seconds...', e);
+            updateWsBadge(false, 'WS: Disconnected');
+            setTimeout(initWebSocket, 3000);
+        };
+
+        socket.onerror = function(err) {
+            console.error('[WebSocket] Error encountered:', err);
+            socket.close();
+        };
+    }
+
+    function updateWsBadge(isConnected, text) {
+        const dot = document.getElementById('ws-indicator-dot');
+        const statusText = document.getElementById('ws-status-text');
+        statusText.textContent = text;
+        if (isConnected) {
+            dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        } else {
+            dot.className = 'w-2 h-2 rounded-full bg-red-400 animate-ping';
+        }
+    }
+
+    /**
+     * Central message dispatcher handling both AI Risk Updates and Localized SOS Alerts
+     */
+    function handleIncomingPayload(msg) {
+        // Stream 1: Automated AI Risk Level Updates
+        if (msg.stream === 'automated_ai_risk' || msg.type === 'risk_level_update') {
+            const data = msg.data || msg.payload;
+            updateTelemetryUI(data);
+
+            // If Critical Warning received, dynamically draw danger zone polygon on Leaflet map
+            if (msg.danger_polygon) {
+                drawHazardPolygon(msg.danger_polygon, data.risk_level);
+            }
+        }
+
+        // Stream 2: Localized SOS Alerts
+        if (msg.stream === 'localized_sos_alert' || msg.type === 'sos_incident') {
+            const report = msg.data;
+            prependSosCard(report, msg.distance_km);
+        }
+    }
+
+    /**
+     * Updates telemetry gauges and hazard indicator colors dynamically without reload
+     */
+    function updateTelemetryUI(data) {
+        document.getElementById('gauge-rainfall').textContent = data.cumulative_rainfall.toFixed(1);
+        document.getElementById('gauge-moisture').textContent = data.soil_moisture.toFixed(1);
+        document.getElementById('gauge-accel').textContent = data.acceleration_rate.toFixed(2);
+        document.getElementById('gauge-t1h').textContent = (data.risk_score_t1h * 100).toFixed(1) + '%';
+        document.getElementById('gauge-t6h').textContent = (data.risk_score_t6h * 100).toFixed(1) + '%';
+        document.getElementById('active-station-badge').textContent = data.station_id;
+
+        // Risk Level Badge Styling
+        const badge = document.getElementById('badge-risk-level');
+        const evacBanner = document.getElementById('evacuation-banner');
+        badge.textContent = data.risk_level.toUpperCase();
+
+        const levelColors = {
+            'Safe': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            'Advisory': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+            'Watch': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+            'Warning': 'bg-red-500/20 text-red-400 border-red-500/30',
+            'Critical': 'bg-red-600 text-white animate-pulse border-red-700'
+        };
+
+        badge.className = `px-2 py-0.5 rounded text-[11px] font-bold uppercase border ${levelColors[data.risk_level] || levelColors['Safe']}`;
+
+        // Show/hide evacuation banner
+        if (data.risk_level === 'Critical') {
+            evacBanner.classList.remove('hidden');
+        } else {
+            evacBanner.classList.add('hidden');
+        }
+
+        // Update map sensor circle color
+        if (stationMarkers[data.station_id]) {
+            const markerColor = data.risk_level === 'Critical' ? '#dc2626' : (data.risk_level === 'Warning' ? '#ea580c' : '#10b981');
+            stationMarkers[data.station_id].setStyle({ fillColor: markerColor });
+        }
+    }
+
+    /**
+     * Prepends newly arrived crowdsourced SOS incident into the feed
+     */
+    function prependSosCard(report, distanceKm) {
+        const container = document.getElementById('sos-feed-container');
+        const placeholder = document.getElementById('no-sos-placeholder');
+        if (placeholder) placeholder.remove();
+
+        const card = document.createElement('div');
+        card.className = 'pt-2 flex items-start justify-between gap-3 text-xs animate-fadeIn';
+        card.innerHTML = `
+            <div class="space-y-1 flex-1">
+                <div class="flex items-center gap-2">
+                    <span class="font-mono text-slate-400 font-semibold">${report.user_id}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[10px]">${report.detected_category}</span>
+                    ${distanceKm ? `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-400 text-[10px] font-mono">${distanceKm} km away</span>` : ''}
+                    <span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-400">${report.verification_status}</span>
+                </div>
+                <p class="text-slate-300 font-sans leading-relaxed">"${report.text_description}"</p>
+            </div>
+        `;
+        container.insertBefore(card, container.firstChild);
+    }
+
+    // --------------------------------------------------------------------------
+    // 3. TEAM SIMULATOR & INTERACTION HELPERS
+    // --------------------------------------------------------------------------
+    function simulateTelemetry(isStorm) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert('WebSocket is connecting. Please wait a moment.');
+            return;
+        }
+        const telemetry = isStorm ? {
+            type: 'simulate_telemetry',
+            station_id: 'STATION-CHAMOLI-01',
+            cumulative_rainfall: 185.0,
+            soil_moisture: 94.0,
+            acceleration_rate: 6.8,
+            latitude: 30.155,
+            longitude: 78.245
+        } : {
+            type: 'simulate_telemetry',
+            station_id: 'STATION-CHAMOLI-01',
+            cumulative_rainfall: 18.0,
+            soil_moisture: 28.0,
+            acceleration_rate: 0.25,
+            latitude: 30.155,
+            longitude: 78.245
+        };
+        socket.send(JSON.stringify(telemetry));
+    }
+
+    function toggleAuthorityRole() {
+        fetch('/api/authority/toggle/', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                location.reload();
+            });
+    }
+
+    function triggerAuthorityEvacuation() {
+        if (!confirm("Are you sure you want to broadcast a MASS EVACUATION ALERT across the mountain sector?")) return;
+        fetch('/api/authority/evacuate/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                zone_name: 'Chamoli Crest Sector 4',
+                latitude: 30.155,
+                longitude: 78.245
+            })
+        }).then(res => res.json()).then(data => {
+            console.log('Evacuation triggered:', data);
+        });
+    }
+
+    function verifySos(reportId, action) {
+        fetch(`/api/sos/verify/${reportId}/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: action })
+        }).then(res => res.json()).then(data => {
+            location.reload();
+        });
+    }
+
+    // SOS Modal Logic
+    function openSosModal() { document.getElementById('sos-modal').classList.remove('hidden'); }
+    function closeSosModal() { document.getElementById('sos-modal').classList.add('hidden'); }
+    function setSosExample(type) {
+        const textarea = document.getElementById('sos-text');
+        if (type === 1) textarea.value = "Turbid muddy springs appearing suddenly at slope toe, water running brown.";
+        if (type === 2) textarea.value = "Utility poles and fence lines tilting downhill, fresh tension cracks visible.";
+        if (type === 3) textarea.value = "Huge crypto discount sale! Click https://scamlink.xyz for free shoes and bonus.";
+    }
+
+    function submitCitizenSos() {
+        const text = document.getElementById('sos-text').value;
+        const reporterId = document.getElementById('sos-reporter-id').value;
+        if (!text.trim()) return;
+
+        fetch('/api/sos/submit/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: reporterId,
+                text_description: text,
+                latitude: defaultCoords[0],
+                longitude: defaultCoords[1]
+            })
+        }).then(res => res.json()).then(data => {
+            closeSosModal();
+            document.getElementById('sos-text').value = '';
+        });
+    }
+
+    // Initialize WebSocket connection on page load
+    window.addEventListener('DOMContentLoaded', initWebSocket);
+</script>
+{% endblock %}

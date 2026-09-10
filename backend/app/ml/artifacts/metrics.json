@@ -1,0 +1,108 @@
+{
+  "accuracy": 0.9583,
+  "r2_score": 0.9917,
+  "rmse": 2.8675,
+  "confusion_matrix": [
+    [
+      1996,
+      11,
+      0,
+      0
+    ],
+    [
+      53,
+      439,
+      12,
+      0
+    ],
+    [
+      0,
+      33,
+      96,
+      10
+    ],
+    [
+      0,
+      0,
+      6,
+      344
+    ]
+  ],
+  "class_labels": [
+    "Safe",
+    "Watch",
+    "Warning",
+    "Critical"
+  ],
+  "classification_report": {
+    "Safe": {
+      "precision": 0.9741337237676916,
+      "recall": 0.9945191828599901,
+      "f1-score": 0.9842209072978304,
+      "support": 2007.0
+    },
+    "Watch": {
+      "precision": 0.9089026915113871,
+      "recall": 0.871031746031746,
+      "f1-score": 0.889564336372847,
+      "support": 504.0
+    },
+    "Warning": {
+      "precision": 0.8421052631578947,
+      "recall": 0.6906474820143885,
+      "f1-score": 0.758893280632411,
+      "support": 139.0
+    },
+    "Critical": {
+      "precision": 0.9717514124293786,
+      "recall": 0.9828571428571429,
+      "f1-score": 0.9772727272727273,
+      "support": 350.0
+    },
+    "accuracy": 0.9583333333333334,
+    "macro avg": {
+      "precision": 0.924223272716588,
+      "recall": 0.8847638884408169,
+      "f1-score": 0.902487812893954,
+      "support": 3000.0
+    },
+    "weighted avg": {
+      "precision": 0.9567796553509087,
+      "recall": 0.9583333333333334,
+      "f1-score": 0.9570678023440067,
+      "support": 3000.0
+    }
+  },
+  "feature_importances": [
+    {
+      "feature": "cumulative_rainfall_24h",
+      "importance": 0.4567
+    },
+    {
+      "feature": "pore_water_pressure",
+      "importance": 0.1526
+    },
+    {
+      "feature": "vibration_frequency",
+      "importance": 0.146
+    },
+    {
+      "feature": "soil_moisture",
+      "importance": 0.0906
+    },
+    {
+      "feature": "rainfall_rate",
+      "importance": 0.0878
+    },
+    {
+      "feature": "slope_angle",
+      "importance": 0.0568
+    },
+    {
+      "feature": "temperature",
+      "importance": 0.0095
+    }
+  ],
+  "total_training_samples": 15000,
+  "test_samples": 3000
+}

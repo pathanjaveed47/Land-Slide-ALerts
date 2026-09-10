@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GeoSentinel AI | Landslide Early Warning System{% endblock %}</title>
+
+    <!-- Tailwind CSS (CDN for zero-build monolithic workflow) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hazard: {
+                            safe: '#10b981',
+                            advisory: '#f59e0b',
+                            watch: '#f97316',
+                            warning: '#ef4444',
+                            critical: '#dc2626'
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Leaflet.js GIS Mapping Library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        /* Custom animated danger polygon pulse */
+        .hazard-polygon-critical {
+            animation: polygonPulse 1.5s infinite alternate;
+        }
+        @keyframes polygonPulse {
+            0% { fill-opacity: 0.35; stroke-width: 2.5; }
+            100% { fill-opacity: 0.75; stroke-width: 4.5; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased overflow-hidden">
+    <!-- Top Header -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between shrink-0 shadow-md">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-lg">
+                ⛰️
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-2">
+                    GeoSentinel AI <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">LEWS MONOLITH</span>
+                </h1>
+                <p class="text-xs text-slate-400">Integrated Geotechnical Monitoring & Disaster Decision Support</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- WebSocket Connection Badge -->
+            <div id="ws-status-badge" class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-mono">
+                <span id="ws-indicator-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span id="ws-status-text" class="text-slate-300">Connecting WS...</span>
+            </div>
+
+            <!-- Authority Status & Mode Switch -->
+            <div class="flex items-center gap-2">
+                <button id="toggle-authority-btn" onclick="toggleAuthorityRole()" class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1.5 {% if is_authority %}bg-red-500/20 text-red-300 border-red-500/40 hover:bg-red-500/30{% else %}bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700{% endif %}">
+                    <span>🛡️ Role:</span>
+                    <strong id="authority-role-label">{% if is_authority %}Civil Authority{% else %}Observer / Field{% endif %}</strong>
+                    <span class="text-[10px] opacity-60 underline ml-1">(Toggle)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex overflow-hidden">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

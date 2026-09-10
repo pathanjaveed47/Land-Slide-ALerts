@@ -1,0 +1,133 @@
+{
+  "risk_T_plus_1h": {
+    "optimal_trees": 70,
+    "test_pr_auc": 0.9636,
+    "test_roc_auc": 0.9988,
+    "hazard_recall": 0.9333,
+    "hazard_f1": 0.918,
+    "confusion_matrix": [
+      [
+        1167,
+        3
+      ],
+      [
+        2,
+        28
+      ]
+    ],
+    "model_path": "ml/artifacts\\rf_model_risk_T_plus_1h.joblib",
+    "training_history": [
+      {
+        "n_estimators": 20,
+        "val_pr_auc": 0.9244,
+        "val_roc_auc": 0.9981,
+        "val_hazard_f1": 0.8788,
+        "val_brier_loss": 0.0061
+      },
+      {
+        "n_estimators": 30,
+        "val_pr_auc": 0.9529,
+        "val_roc_auc": 0.9988,
+        "val_hazard_f1": 0.8923,
+        "val_brier_loss": 0.0057
+      },
+      {
+        "n_estimators": 40,
+        "val_pr_auc": 0.9472,
+        "val_roc_auc": 0.9987,
+        "val_hazard_f1": 0.875,
+        "val_brier_loss": 0.0057
+      },
+      {
+        "n_estimators": 50,
+        "val_pr_auc": 0.9562,
+        "val_roc_auc": 0.9988,
+        "val_hazard_f1": 0.875,
+        "val_brier_loss": 0.0055
+      },
+      {
+        "n_estimators": 60,
+        "val_pr_auc": 0.9554,
+        "val_roc_auc": 0.9988,
+        "val_hazard_f1": 0.8923,
+        "val_brier_loss": 0.0055
+      },
+      {
+        "n_estimators": 70,
+        "val_pr_auc": 0.9624,
+        "val_roc_auc": 0.999,
+        "val_hazard_f1": 0.9231,
+        "val_brier_loss": 0.0054
+      },
+      {
+        "n_estimators": 80,
+        "val_pr_auc": 0.9588,
+        "val_roc_auc": 0.9989,
+        "val_hazard_f1": 0.9091,
+        "val_brier_loss": 0.0055
+      },
+      {
+        "n_estimators": 90,
+        "val_pr_auc": 0.9585,
+        "val_roc_auc": 0.9989,
+        "val_hazard_f1": 0.9091,
+        "val_brier_loss": 0.0055
+      },
+      {
+        "n_estimators": 100,
+        "val_pr_auc": 0.9578,
+        "val_roc_auc": 0.9989,
+        "val_hazard_f1": 0.8923,
+        "val_brier_loss": 0.0056
+      }
+    ]
+  },
+  "risk_T_plus_6h": {
+    "optimal_trees": 20,
+    "test_pr_auc": 0.9316,
+    "test_roc_auc": 0.9971,
+    "hazard_recall": 0.881,
+    "hazard_f1": 0.8043,
+    "confusion_matrix": [
+      [
+        1145,
+        13
+      ],
+      [
+        5,
+        37
+      ]
+    ],
+    "model_path": "ml/artifacts\\rf_model_risk_T_plus_6h.joblib",
+    "training_history": [
+      {
+        "n_estimators": 20,
+        "val_pr_auc": 0.9873,
+        "val_roc_auc": 0.9995,
+        "val_hazard_f1": 0.8791,
+        "val_brier_loss": 0.0055
+      },
+      {
+        "n_estimators": 30,
+        "val_pr_auc": 0.9887,
+        "val_roc_auc": 0.9995,
+        "val_hazard_f1": 0.9195,
+        "val_brier_loss": 0.0051
+      },
+      {
+        "n_estimators": 40,
+        "val_pr_auc": 0.987,
+        "val_roc_auc": 0.9995,
+        "val_hazard_f1": 0.9091,
+        "val_brier_loss": 0.0051
+      },
+      {
+        "n_estimators": 50,
+        "val_pr_auc": 0.9857,
+        "val_roc_auc": 0.9994,
+        "val_hazard_f1": 0.9195,
+        "val_brier_loss": 0.0054
+      }
+    ]
+  }
+}
