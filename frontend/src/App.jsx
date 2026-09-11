@@ -289,6 +289,7 @@ export default function App() {
         stations={stations}
         activeAlerts={activeAlerts}
         evacuationOrders={evacuationOrders}
+        onNavigateAlerts={() => setActiveTab('alerts')}
         onViewStation={(stn) => {
           setSelectedStationId(stn.id);
           setActiveTab('map');
@@ -302,7 +303,7 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <Dashboard 
             stations={stations}
-            alerts={activeAlerts}
+            activeAlerts={activeAlerts}
             onSelectStation={(id) => {
               setSelectedStationId(id);
               setActiveTab('charts');

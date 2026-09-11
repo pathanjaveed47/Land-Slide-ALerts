@@ -1,4 +1,8 @@
-const API_BASE = '/api';
+export const GLOBAL_HOST = (typeof window !== 'undefined' && window.location && window.location.origin)
+  ? window.location.origin
+  : 'http://127.0.0.1:8000';
+
+export const API_BASE = `${GLOBAL_HOST}/api`;
 
 // --- Stations ---
 export async function fetchStations() {

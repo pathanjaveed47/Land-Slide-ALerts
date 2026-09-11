@@ -21,6 +21,13 @@ import {
 } from 'lucide-react';
 
 const MAP_LAYERS = {
+  maptiler: {
+    name: 'MapTiler Streets',
+    description: 'MapTiler street and terrain tiles',
+    url: `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAPTILER_API_KEY || ''}`,
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  },
   carto: {
     name: 'CartoDB Dark',
     description: 'CartoDB dark matter base tiles',
@@ -151,6 +158,7 @@ export default function MapView({
   const [activeLayerKey, setActiveLayerKey] = useState('carto');
   const [showGeofence, setShowGeofence] = useState(true);
   const [showSOS, setShowSOS] = useState(true);
+  const hasMapTilerKey = Boolean(import.meta.env.VITE_MAPTILER_API_KEY);
 
   const currentLayer = MAP_LAYERS[activeLayerKey] || MAP_LAYERS.carto;
 
@@ -203,6 +211,17 @@ export default function MapView({
           {/* Layer Selector */}
           <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
             <button
+              onClick={() => hasMapTilerKey && setActiveLayerKey('maptiler')}
+              disabled={!hasMapTilerKey}
+              title={hasMapTilerKey ? 'Use MapTiler GIS tiles' : 'Set VITE_MAPTILER_API_KEY to enable MapTiler'}
+              className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                activeLayerKey === 'maptiler' ? 'bg-blue-600 text-white font-medium' : 'text-slate-400 hover:text-white'
+              } ${!hasMapTilerKey ? 'opacity-40 cursor-not-allowed' : ''}`}
+            >
+              <Layers className="h-3.5 w-3.5" />
+              <span>Map API</span>
+            </button>
+            <button
               onClick={() => setActiveLayerKey('carto')}
               className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
                 activeLayerKey === 'carto' ? 'bg-blue-600 text-white font-medium' : 'text-slate-400 hover:text-white'
@@ -229,6 +248,13 @@ export default function MapView({
               <Compass className="h-3.5 w-3.5" />
               <span>Topographic</span>
             </button>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-slate-300 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+            <span className="h-2.5 w-2.5 rounded-full bg-orange-500 border border-orange-200" />
+            <span>Danger zone</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-red-600 border border-red-200 ml-1" />
+            <span>Critical / evacuation</span>
           </div>
 
           {/* Station Focus Selector */}

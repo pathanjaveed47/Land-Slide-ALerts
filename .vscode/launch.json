@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🌐 Run Server + Global Host (F5)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_with_global_host.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "🚀 Debug Local Server (FastAPI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_unified.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "🧪 Run PyTest E2E Suite",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/test_unified_e2e.py", "-v", "-s"],
+      "console": "integratedTerminal"
+    }
+  ]
+}

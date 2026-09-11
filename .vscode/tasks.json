@@ -1,0 +1,55 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🌐 Launch Global Host (Cloudflare Tunnel)",
+      "type": "shell",
+      "command": "& 'C:\\Program Files (x86)\\cloudflared\\cloudflared.exe' tunnel --url http://localhost:8000",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "🚀 Start Local Server (FastAPI + React)",
+      "type": "shell",
+      "command": "python run_unified.py",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "⚡ Full Platform + Global Host (One-Click)",
+      "type": "shell",
+      "command": "python run_with_global_host.py",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "🧪 Run E2E Test Suite",
+      "type": "shell",
+      "command": "python -m pytest tests/test_unified_e2e.py -v",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    }
+  ]
+}

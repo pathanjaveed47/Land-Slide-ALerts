@@ -7,7 +7,26 @@ class Settings:
     API_PREFIX: str = "/api"
     API_V1_STR: str = "/api/v1"
     DEBUG: bool = False
-    CORS_ORIGINS: List[str] = ["*"]
+
+    # Global host/origin configuration
+    GLOBAL_HOST: str = os.getenv("GLOBAL_HOST", "http://127.0.0.1:8000")
+    GLOBAL_HOST_NO_PORT: str = GLOBAL_HOST.replace(":8000", "") if GLOBAL_HOST.endswith(":8000") else GLOBAL_HOST
+    CORS_ORIGINS: List[str] = [
+        origin.strip()
+        for origin in os.getenv(
+            "CORS_ORIGINS",
+            ",".join([
+                GLOBAL_HOST,
+                "http://127.0.0.1:8000",
+                "http://localhost:8000",
+                "http://127.0.0.1:5173",
+                "http://localhost:5173",
+                "http://127.0.0.1",
+                "http://localhost"
+            ])
+        ).split(",")
+        if origin.strip()
+    ]
 
     # Base paths
     APP_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
