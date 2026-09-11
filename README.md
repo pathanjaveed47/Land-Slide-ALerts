@@ -165,3 +165,5 @@ All 10 integration and unit tests pass with 100% coverage:
 5. **Simulate a Cloudburst Disaster**:
    - Click **"Demo"** in the top navbar to trigger the 3-minute escalating disaster scenario.
    - Watch the telemetry charts show Factor of Safety drop below 1.0 (limit equilibrium failure) and automated alerts dispatch to civil defense logs.
+#   L a n d - S l i d e - A L e r t s  
+ 
